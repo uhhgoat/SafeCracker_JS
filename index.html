@@ -1,0 +1,843 @@
+﻿<!DOCTYPE HTML>
+<!--Matyas Fenyves-->
+<html>
+	<head>
+		<title>SafeCracker</title>
+	</head>
+	<style>
+		h1
+		{
+			text-align:center ;
+			font-size:40pt ;
+		}
+		button
+		{
+			font-size: 20px ;
+			background-color: orange ;
+		}
+		span,div
+		{
+			font-size:20pt ;
+			text-align:center ;
+		}
+		button#resetbtn
+		{
+			float:right ;
+		}
+		span#cashamt,span#inventory
+		{
+			position:fixed ;
+			width:2in ;
+			text-align:left ;
+		}
+		table
+		{
+			margin-left:25% ;
+			width:50% ;
+		}
+		td
+		{
+			border:thin solid ;
+		}
+		div#safes>img
+		{
+			position:fixed;
+			top:0px;
+			left:0px;
+			width:100%;
+			height:100%;
+			z-index:-1;
+		}
+		body
+		{
+			font-family:comic sans ms;
+		}
+	</style>
+	<script>
+		
+		function initialValues()
+		{
+			roundNum = 1 ;
+			digitRange = 3 ;
+			digit1 = parseInt(Math.random()*digitRange+1) ;
+			digit2 = parseInt(Math.random()*digitRange+1) ;
+			digit3 = parseInt(Math.random()*digitRange+1) ;
+			digit4 = parseInt(Math.random()*digitRange+1) ;
+			digit5 = parseInt(Math.random()*digitRange+1) ;
+			digit6 = parseInt(Math.random()*digitRange+1) ;
+			digit7 = parseInt(Math.random()*digitRange+1) ;
+			digit8 = parseInt(Math.random()*digitRange+1) ;
+			digit9 = parseInt(Math.random()*digitRange+1) ;
+			numDigits = 3 ;
+			money = 0000 ;
+			digits1 = "" + digit1 + digit2 + digit3 ;
+			combination = "digits" + roundNum ;
+			code1 = "" ;
+			startingAttempts = 5 ;
+			attempts = startingAttempts + parseInt(Math.random()*roundNum+1) ;
+			codeTry = "" ;
+			numLockpicks = 0 ;
+			numDynamite = 0 ;
+			numMagnets = 0 ;
+			numStealthSuits = 0 ;
+			numLawyers = 0 ;
+			numHenchmen = 0 ;
+			safeOpened = false ;
+			alarmOn = false ;
+			moneyConstant = parseInt(Math.random()*6+1) ;
+			moneyEarned = roundNum*(moneyConstant)*1000 ;
+			jewelchance = parseInt(Math.random()*100+1) ;
+			
+		}
+		
+		
+		
+		function storedVariables()
+		{
+			safenum = document.getElementById("safeno") ;
+			wallet = document.getElementById("cashamt") ;
+			combo = document.getElementById("safecombo") ;
+			cash = document.getElementById("cashamt") ;
+			tries = document.getElementById("remtries") ;
+			items = document.getElementById("inventory") ;
+			result = document.getElementById("guessresult") ;
+			storeToggle = document.getElementById("storebtn") ;
+			storeToggle.innerHTML = "Store" ;
+			next = document.getElementById("nextbtn") ;
+			itemButtons = document.getElementById("itembtns") ;
+			
+			result.innerHTML = "" ;
+			openedSafe() ;
+			alarmSystem() ;
+			hidescreens() ;
+			rangeOfDigits();
+			tempDigits() ;
+			//generateDashes();
+			numOfDigits() ;
+			enableGoods();
+			display() ;
+		}
+		function hidescreens()
+		{
+			safescrn = document.getElementById("safes") ;
+			safescrn.style.display = "block" ;
+			storescrn = document.getElementById("storescreen") ;
+			storescrn.style.display = "none" ;
+			winscrn = document.getElementById("wonscreen") ;
+			winscrn.style.display = "none" ;
+			losescrn = document.getElementById("lostscreen") ;
+			losescrn.style.display = "none" ;
+			butt1 = document.getElementById("guess1") ;
+			butt2 = document.getElementById("guess2") ;
+			butt3 = document.getElementById("guess3") ;
+			butt4 = document.getElementById("guess4") ;
+			butt5 = document.getElementById("guess5") ;
+			butt6 = document.getElementById("guess6") ;
+			butt7 = document.getElementById("guess7") ;
+			butt8 = document.getElementById("guess8") ;
+			butt9 = document.getElementById("guess9") ;
+			next.disabled = true ;
+			itemButtons.style.display = "none" ;
+			jewelsPresent = false ;
+		}
+		/*function generateDashes()
+		{
+			for (i = 0 ; i < numDigits ; i++)
+				{
+					if (combination.charAt(i) == "")
+					{
+						code1 += "" ;
+					}
+					else
+					{
+						code1 += "-" ;
+					}
+				}
+				code1 = "" + tmp1 + tmp2 + tmp3 ;
+		}*/
+		function display()
+		{
+			safenum.innerHTML = "Safe Number " + roundNum ;
+			cash.innerHTML = "$" + money ;
+			combo.innerHTML = code1 ;
+			tries.innerHTML = attempts ;
+			items.innerHTML = "Lockpicks(" + numLockpicks + "), " + "Dyanmite(" + numDynamite + "), " + "Magnets(" + numMagnets + "), " + "Stealth Suits(" + numStealthSuits + "), " + "Lawyers(" + numLawyers + "), " + "Henchmen(" + numHenchmen + ") " ;
+			
+		}
+		
+			function enableGoods()
+			{
+				if(safeOpened == true)
+				{
+					storeToggle.disabled = false ;
+				}
+				else
+				{
+					storeToggle.disabled = true ;
+				}
+				if(money >= 1000)
+				{
+					document.getElementById("lockpick").disabled = false ;
+				}
+				else
+				{
+					document.getElementById("lockpick").disabled = true ;
+				}
+				if(money >= 5000)
+				{
+					document.getElementById("dynamite").disabled = false ;
+				}
+				else
+				{
+					document.getElementById("dynamite").disabled = true ;
+				}
+				if(money >= 2000)
+				{
+					document.getElementById("magnet").disabled = false ;
+				}
+				else
+				{
+					document.getElementById("magnet").disabled = true ;
+				}
+				if(money >= 20000)
+				{
+					document.getElementById("stealthsuit").disabled = false ;
+				}
+				else
+				{
+					document.getElementById("stealthsuit").disabled = true ;
+				}
+				if(money >= 50000)
+				{
+					document.getElementById("lawyer").disabled = false ;
+				}
+				else
+				{
+					document.getElementById("lawyer").disabled = true ;
+				}
+				if(money >= 75000)
+				{
+					document.getElementById("henchmen").disabled = false ;
+				}
+				else
+				{
+					document.getElementById("henchmen").disabled = true ;
+				}
+			}
+			
+			function buyLockpick()
+			{
+				money -= 1000 ;
+				numLockpicks++
+				enableGoods();
+				display();
+			}
+			function buyDynamite()
+			{
+				money -= 5000 ;
+				numDynamite++
+				enableGoods();
+				display();
+			}
+			function buyMagnet()
+			{
+				money -= 2000 ;
+				numMagnets++
+				enableGoods();
+				display();
+			}
+			function buyStealthSuit()
+			{
+				money -= 20000 ;
+				numStealthSuits++
+				enableGoods();
+				display();
+			}
+			function buyLawyer()
+			{
+				money -= 50000 ;
+				numLawyers++
+				enableGoods();
+				display();
+			}
+			function buyHenchmen()
+			{
+				money -= 75000 ;
+				numHenchmen++
+				enableGoods();
+				display();
+			}
+			function toggleStore()
+			{
+				if(storescrn.style.display == "none")
+				{
+					storescrn.style.display = "block" ;
+					safescrn.style.display = "none" ;
+					storeToggle.innerHTML = "Back" ;
+				}
+				else
+				{
+					storescrn.style.display = "none" ;
+					safescrn.style.display = "block" ;
+					storeToggle.innerHTML = "Store" ;
+				}
+				display();
+			}
+			
+			function toggleItems()
+			{
+				itemButtons.style.display = "block" ;
+			}
+			
+			function lockpickBTN()
+			{
+				if(numLockpicks >= 1)
+				{
+					
+					numLockpicks-- ;
+					digitConstant = parseInt(Math.random*digitRange+1) ;
+					if(digit1 = digitConstant)
+						tmp1 = digit1 ;
+					if(digit2 = digitConstant)
+						tmp2 = digit2 ;
+					if(digit3 = digitConstant)
+						tmp3 = digit3 ;
+					if(digit4 = digitConstant)
+						tmp4 = digit4 ;
+					if(digit5 = digitConstant)
+						tmp5 = digit5 ;
+					if(digit6 = digitConstant)
+						tmp6 = digit6 ;
+					if(digit7 = digitConstant)
+						tmp7 = digit7 ;
+					if(digit8 = digitConstant)
+						tmp8 = digit8 ;
+					if(digit9 = digitConstant)
+						tmp9 = digit9 ;
+				}
+				itemButtons.style.display = "none" ;
+				display() ;
+			}
+			function dynamiteBTN()
+			{
+				if(numDynamite >= 1)
+				{
+					
+					numDynamite-- ;
+					safeOpened = true ;
+					moneyDestroyed = parseInt(Math.random*moneyEarned+1) ;
+					money -= moneyDestroyed ;
+				}
+				if(jewelsPresent == true)
+				{
+					safescrn.style.display = "none" ;
+					losescrn.style.display = "block" ;
+				}
+				itemButtons.style.display = "none" ;
+				openedSafe() ;
+				display() ;
+			}
+			function magnetBTN()
+			{
+				if(numMagnets >= 1)
+				{
+					
+					attempts += parseInt(Math.random()*6) ;
+					chances = parseInt(Math.random()*10+1) ;
+					if(chances == 1)
+					{
+						//alarmOn = true ;
+						attempts = 0 ;
+						alarmSystem() ;
+					}
+					if(chances >= 1 && chances <= 4)
+					{
+						numMagnets-- ;
+					}
+				}
+				itemButtons.style.display = "none" ;
+				display() ;
+			}
+			function stealthBTN()
+			{
+				if(numStealthSuits >= 1)
+				{
+					
+					numStealthSuits-- ;
+					safeOpened = false ;
+					attempts = startingAttempts + parseInt(Math.random()*roundNum+1) ;
+					tempDigits() ;
+					rangeOfDigits() ;
+					numOfDigits() ;
+					openedSafe() ;
+					alarmSystem() ;
+					hidescreens() ;
+					enableGoods();
+				}
+				itemButtons.style.display = "none" ;
+				display() ;
+			}
+			function lawyerBTN()
+			{
+				if (numLawyers >= 1 && attempts == 0 && alarmOn == true && safeOpened == false)
+				{
+					
+					numLawyers-- ;
+					safeOpened = false ;
+					attempts = startingAttempts + parseInt(Math.random()*roundNum+1) ;
+					tempDigits() ;
+					rangeOfDigits() ;
+					numOfDigits() ;
+					openedSafe() ;
+					alarmSystem() ;
+					hidescreens() ;
+					enableGoods();
+				}
+				display() ;
+			}
+			function henchmanBTN()
+			{
+				for(i = numHenchmen ; i >= 1 ; i--)
+				{
+					if(alarmOn == true)
+					{
+						attempts += (parseInt(Math.random()*6+1)*numHenchmen) ;
+					}
+				}
+				itemButtons.style.display = "none" ;
+				numHenchmen = 0 ;
+				display() ;
+			}
+			
+			function tempDigits()
+			{
+				tmp1 = "-" ;
+				tmp2 = "-" ;
+				tmp3 = "-" ;
+				tmp4 = "-" ;
+				tmp5 = "-" ;
+				tmp6 = "-" ;
+				tmp7 = "-" ;
+				tmp8 = "-" ;
+				tmp9 = "-" ;
+			}
+			function digInput(dig)
+			{
+				if(code1.charAt(0) == "-")
+				{
+					tmp1 = dig ;
+				}
+				else
+				{
+					if(code1.charAt(1) == "-")
+					{
+						tmp2 = dig ;
+					}
+					else
+					{
+						if(code1.charAt(2) == "-")
+						{
+							tmp3 = dig ;
+						}
+						else
+						{
+							if(code1.charAt(3) == "-")
+							{
+								tmp4 = dig ;
+							}
+							else
+							{
+								if(code1.charAt(4) == "-")
+								{
+									tmp5 = dig ;
+								}
+								else
+								{
+									if(code1.charAt(5) == "-")
+									{
+										tmp6 = dig ;
+									}
+									else
+									{
+										if(code1.charAt(6) == "-")
+										{
+											tmp7 = dig ;
+										}
+										else
+										{
+											if(code1.charAt(7) == "-")
+											{
+												tmp8 = dig ;
+											}
+											else
+											{
+												if(code1.charAt(8) == "-")
+												{
+													tmp9 = dig ;
+												}
+												else
+												{
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				//generateDashes();
+				numOfDigits();
+				checkCombo();
+				openedSafe() ;
+				alarmSystem() ;
+				enableGoods();
+				display();
+			}
+			function checkCombo()
+			{
+				if(code1.charAt(numDigits-1) != "-")
+				{
+					attempts-- ;
+					if(parseInt(code1) < parseInt(digits1))
+					{
+						result.innerHTML = "Too Low" ;
+					}
+					if(parseInt(code1) > parseInt(digits1))
+					{
+						result.innerHTML = "Too High" ;
+					}
+					if(parseInt(code1) == parseInt(digits1))
+					{
+						result.innerHTML = "Safe Cracked!" ;
+						safeOpened = true ;
+					}
+					
+				}
+			}
+			function alarmSystem()
+			{
+				if (attempts == 0 && alarmOn == false)
+				{
+					alarmOn = true ;
+					attempts = 3;
+				}
+				if (attempts == 0 && alarmOn == true && safeOpened == false)
+				{
+					safescrn.style.display = "none" ;
+					losescrn.style.display = "block" ;
+				}
+				henchmanBTN() ;
+				lawyerBTN() ;
+			}
+			
+			function openedSafe()
+			{
+				if(safeOpened == true)
+				{
+					moneyEarned = roundNum*(moneyConstant)*1000 ;
+					money =+ moneyEarned ;
+					next.disabled = false ;
+					if(jewelchance <= roundNum)
+					{
+						safescrn.style.display = "none" ;
+						winscrn.style.display = "block" ;
+					}
+					
+				}
+			}
+			function nextSafe()
+			{
+				
+				jewelchance = parseInt(Math.random()*100+1) ;
+				safeOpened = false ;
+				startingAttempts++ ;
+				attempts = startingAttempts + parseInt(Math.random()*roundNum+1) ;
+				roundNum++ ;
+				tempDigits() ;
+				rangeOfDigits() ;
+				numOfDigits() ;
+				openedSafe() ;
+				alarmSystem() ;
+				hidescreens() ;
+				enableGoods();
+				display() ;
+				
+			}
+			
+			function numOfDigits()
+			{
+				if(roundNum <= 4)
+				{
+					numDigits = 3 ;
+					code1 = "" + tmp1 + tmp2 + tmp3 ;
+					digits1 = "" + digit1 + digit2 + digit3 ;
+				}
+				if(roundNum >= 5 && roundNum <= 8)
+				{
+					numDigits = 4 ;
+					code1 = "" + tmp1 + tmp2 + tmp3 + tmp4 ;
+					digits1 = "" + digit1 + digit2 + digit3 + digit4 ;
+				}
+				if(roundNum >= 9 && roundNum <= 11)
+				{
+					numDigits = 5 ;
+					code1 = "" + tmp1 + tmp2 + tmp3 + tmp4 + tmp5 ;
+					digits1 = "" + digit1 + digit2 + digit3 + digit4 + digit5 ;
+				}
+				if(roundNum >= 12 && roundNum <= 14)
+				{
+					numDigits = 6 ;
+					code1 = "" + tmp1 + tmp2 + tmp3 + tmp4 + tmp5 + tmp6 ;
+					digits1 = "" + digit1 + digit2 + digit3 + digit4 + digit5 + digit6 ;
+				}
+				if(roundNum >= 15 && roundNum <= 17)
+				{
+					numDigits = 7 ;
+					code1 = "" + tmp1 + tmp2 + tmp3 + tmp4 + tmp5 + tmp6 + tmp7 ;
+					digits1 = "" + digit1 + digit2 + digit3 + digit4 + digit5 + digit6 + digit7 ;
+				}
+				if(roundNum >= 18 && roundNum <= 19)
+				{
+					numDigits = 8 ;
+					code1 = "" + tmp1 + tmp2 + tmp3 + tmp4 + tmp5 + tmp6 + tmp7 + tmp8 ;
+					digits1 = "" + digit1 + digit2 + digit3 + digit4 + digit5 + digit6 + digit7 + digit8 ;
+				}
+				if(roundNum >= 20)
+				{
+					numDigits = 9 ;
+					code1 = "" + tmp1 + tmp2 + tmp3 + tmp4 + tmp5 + tmp6 + tmp7 + tmp8 + tmp9 ;
+					digits1 = "" + digit1 + digit2 + digit3 + digit4 + digit5 + digit6 + digit7 + digit8 + digit9 ;
+					
+				}
+			}
+			
+			function rangeOfDigits()
+			{
+				if(roundNum == 1)
+				{
+					digitRange = 3 ;
+					butt1.style.display = "inline" ;
+					butt2.style.display = "inline" ;
+					butt3.style.display = "inline" ;
+					butt4.style.display = "none" ;
+					butt5.style.display = "none" ;
+					butt6.style.display = "none" ;
+					butt7.style.display = "none" ;
+					butt8.style.display = "none" ;
+					butt9.style.display = "none" ;
+				}
+				if(roundNum == 2 || roundNum == 5)
+				{
+					digitRange = 4 ;
+					butt1.style.display = "inline" ;
+					butt2.style.display = "inline" ;
+					butt3.style.display = "inline" ;
+					butt4.style.display = "inline" ;
+					butt5.style.display = "none" ;
+					butt6.style.display = "none" ;
+					butt7.style.display = "none" ;
+					butt8.style.display = "none" ;
+					butt9.style.display = "none" ;
+				}
+				if(roundNum == 3 || roundNum == 6 || roundNum == 9)
+				{
+					digitRange = 5 ;
+					butt1.style.display = "inline" ;
+					butt2.style.display = "inline" ;
+					butt3.style.display = "inline" ;
+					butt4.style.display = "inline" ;
+					butt5.style.display = "inline" ;
+					butt6.style.display = "none" ;
+					butt7.style.display = "none" ;
+					butt8.style.display = "none" ;
+					butt9.style.display = "none" ;
+				}
+				if(roundNum == 4 || roundNum == 7 || roundNum == 10 || roundNum == 12)
+				{
+					digitRange = 6 ;
+					butt1.style.display = "inline" ;
+					butt2.style.display = "inline" ;
+					butt3.style.display = "inline" ;
+					butt4.style.display = "inline" ;
+					butt5.style.display = "inline" ;
+					butt6.style.display = "inline" ;
+					butt7.style.display = "none" ;
+					butt8.style.display = "none" ;
+					butt9.style.display = "none" ;
+				}
+				if(roundNum == 8 || roundNum == 11 || roundNum == 13 || roundNum == 15)
+				{
+					digitRange = 7 ;
+					butt1.style.display = "inline" ;
+					butt2.style.display = "inline" ;
+					butt3.style.display = "inline" ;
+					butt4.style.display = "inline" ;
+					butt5.style.display = "inline" ;
+					butt6.style.display = "inline" ;
+					butt7.style.display = "inline" ;
+					butt8.style.display = "none" ;
+					butt9.style.display = "none" ;
+				}
+				if(roundNum == 14 || roundNum == 16 || roundNum == 18)
+				{
+					digitRange = 8 ;
+					butt1.style.display = "inline" ;
+					butt2.style.display = "inline" ;
+					butt3.style.display = "inline" ;
+					butt4.style.display = "inline" ;
+					butt5.style.display = "inline" ;
+					butt6.style.display = "inline" ;
+					butt7.style.display = "inline" ;
+					butt8.style.display = "inline" ;
+					butt9.style.display = "none" ;
+				}
+				if(roundNum == 17 || roundNum == 19 || roundNum >= 20)
+				{
+					digitRange = 9 ;
+					butt1.style.display = "inline" ;
+					butt2.style.display = "inline" ;
+					butt3.style.display = "inline" ;
+					butt4.style.display = "inline" ;
+					butt5.style.display = "inline" ;
+					butt6.style.display = "inline" ;
+					butt7.style.display = "inline" ;
+					butt8.style.display = "inline" ;
+					butt9.style.display = "inline" ;
+				}
+				//Reset the digit values based on new ranges
+				digit1 = parseInt(Math.random()*digitRange+1) ;
+				digit2 = parseInt(Math.random()*digitRange+1) ;
+				digit3 = parseInt(Math.random()*digitRange+1) ;
+				digit4 = parseInt(Math.random()*digitRange+1) ;
+				digit5 = parseInt(Math.random()*digitRange+1) ;
+				digit6 = parseInt(Math.random()*digitRange+1) ;
+				digit7 = parseInt(Math.random()*digitRange+1) ;
+				digit8 = parseInt(Math.random()*digitRange+1) ;
+				digit9 = parseInt(Math.random()*digitRange+1) ;
+			}
+			
+			function restartGame()
+			{
+				initialValues();
+				storedVariables();
+			}
+		
+	</script>
+	<body onload = "initialValues(); storedVariables();">
+		<h1>SafeCracker</h1>
+		<span id = "cashamt"></span> <button id = "resetbtn" onclick = "restartGame() ;">Restart Game</button>
+		<br /><br />
+		<span id = "inventory"></span>
+		<br /><br /><br /><br /><br />
+		<div id = "safes">
+			<img src = "safe.png" />
+			<div id = "safeno"></div>
+			<div id = "safe">
+				<span id = "safecombo"></span>
+			</div>
+			<div id = "guessresult"></div>
+			<div id = "guessbtns">
+				<button id = "guess1" onclick = "digInput('1') ;">1</button>
+				<button id = "guess2" onclick = "digInput('2') ;">2</button>
+				<button id = "guess3" onclick = "digInput('3') ;">3</button>
+				<button id = "guess4" onclick = "digInput('4') ;">4</button>
+				<button id = "guess5" onclick = "digInput('5') ;">5</button>
+				<button id = "guess6" onclick = "digInput('6') ;">6</button>
+				<button id = "guess7" onclick = "digInput('7') ;">7</button>
+				<button id = "guess8" onclick = "digInput('8') ;">8</button>
+				<button id = "guess9" onclick = "digInput('9') ;">9</button>
+			</div>
+			<br />
+			<div>
+				<button id = "reset" onclick = "tempDigits(); numOfDigits() ; display();">Reset</button>
+				<button id = "itemuse" onclick = "toggleItems() ;">Use Item</button>
+				<div id = "itembtns">
+					<button onclick = "lockpickBTN();">Lockpick</button>
+					<button onclick = "dynamiteBTN();">Dynamite</button>
+					<button onclick = "magnetBTN();">Magnet</button>
+					<button onclick = "stealthBTN();">Stealth Suit</button>
+					<!--<button onclick = "lawyerBTN();">Lawyer</button>
+					<button onclick = "henchmanBTN();">Henchman</button>-->
+				</div>
+				<br />
+				<span id = "remtries"></span>
+			</div>
+			<div>
+			<button id = "nextbtn" onclick = "nextSafe() ;">Continue</button>
+			</div>
+		</div>
+		
+		
+		<div id = "storescreen"> <!--Screen shows after a safe is complete, and hidden again when going to the next safe-->
+			<table>Store
+				<tr>
+					<td>Item</td>
+					<td>Cost</td>
+					<td>Usage</td>
+				</tr>
+				<tr>
+					<td>Lockpick<br /><button id = "lockpick" onclick = "buyLockpick();">Purchase</button></td>
+					<td>$1000</td>
+					<td>A lockpick has 1 use only and will reveal 1 random digit from the code.</td>
+				</tr>
+				<tr>
+					<td>Dynamite<br /><button id = "dynamite" onclick = "buyDynamite();">Purchase</button></td>
+					<td>$5000</td>
+					<td>Dynamite has 1 use only.  It will blow open a safe automatically.  However, a random amount of money inside the safe may be destroyed.   
+					If the jewels are in the safe, they, too, are destroyed.  In a fit of despair the player turns him or herself into the police and loses the game.</td>
+				</tr>
+				<tr>
+					<td>Magnet<br /><button id = "magnet" onclick = "buyMagnet();">Purchase</button></td>
+					<td>$2000</td>
+					<td>Will add time to the clock.  Each time a magnet is used, there is a 10% chance that it will set off the alarm rather than add time.  
+					There is also a 40% chance that the magnet will break and become unusable again.</td>
+				</tr>
+				<tr>
+					<td>Stealth Suit<br /><button id = "stealthsuit" onclick = "buyStealthSuit();">Purchase</button></td>
+					<td>$20000</td>
+					<td>The player can choose to escape at any time, regardless of whether or not the safe has been cracked.  
+					A stealth suit has a lifetime of 1 – 4 uses before it wears out and is unusable.</td>
+				</tr>
+				<tr>
+					<td>Lawyer<br /><button id = "lawyer" onclick = "buyLawyer();">Purchase</button></td>
+					<td>$50000</td>
+					<td>A lawyer has 1 use.  If the player is caught by the police, (s)he can buy his/her freedom and continue cracking safes.  
+					A player must have a lawyer in his/her possession when caught.</td>
+				</tr>
+				<tr>
+					<td>Henchmen<br /><button id = "henchmen" onclick = "buyHenchmen();">Purchase</button></td>
+					<td>$75000</td>
+					<td>A Henchman will hold off the police while a safecracker continues to work on the safe.  
+					A henchman can last anywhere from 1 - 6 turns against the police , giving the player that many more chances to crack the safe.  
+					After those turns are up the henchman surrenders and is hauled away.  
+					The Henchman will begin battling police as soon as the 3 turn grace period is up and the countdown to each henchman's surrender will begin. </td>
+				</tr>
+			</table>
+		</div>
+		
+		<div id = "wonscreen"><!--Screen shows after game is won, only restart button should still be there-->
+			<br />
+			<img src = "jewels.jpg" />
+			CONGRATULATIONS!
+			<br />
+			YOU WON!
+		</div>
+		
+		<div id = "lostscreen"><!--Screen shows after game is lost, only restart button should still be there-->
+			<img src = "police.jpg" />
+			<br />
+			Sorry! Cops got you!
+			<br />
+			YOU LOSE!
+		</div>
+		
+		
+		<div>
+			<button id = "storebtn" onclick = "toggleStore() ;">Store/Back</button>
+		</div>
+		<script>
+			
+		</script>
+	</body>
+</html>
